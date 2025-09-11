@@ -1,4 +1,4 @@
-# homebrew-git-flow-next
+# homebrew-tap
 
 This is the official Homebrew tap for installing [`git-flow-next`](https://github.com/gittower/git-flow-next) — a modern, Go-based reimplementation of the Git Flow branching model.
 
@@ -8,16 +8,10 @@ This is the official Homebrew tap for installing [`git-flow-next`](https://githu
 
 ## Installation
 
-### Step 1: Tap the repository
+### Install git-flow-next
 
 ```bash
-brew tap gittower/git-flow-next
-```
-
-### Step 2: Install the binary
-
-```bash
-brew install git-flow-next
+brew install gittower/tap/git-flow-next
 ```
 ### Upgrading
 

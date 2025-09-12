@@ -1,7 +1,7 @@
 class GitFlowNext < Formula
   desc "Next-generation Git Flow tool"
   homepage "https://github.com/gittower/git-flow-next"
-  version "v0.1.0-rc.2"
+  version "0.1.0-rc.2"
 
   on_macos do
     if Hardware::CPU.intel?

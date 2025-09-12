@@ -28,9 +28,10 @@ brew uninstall git-flow-next
 
 ### Development
 
-To update the formula after a new git-flow-next release:
+To update the formula after a new git-flow-next release, simply run:
 
-1. Update the version number in `Formula/git-flow-next.rb`
-2. Replace the URLs with the new release asset URLs
-3. Update all corresponding SHA256 checksums
-4. Commit and push
+```bash
+./update_formula.rb
+```
+
+This script automatically fetches the latest release from GitHub, updates checksums, and commits the changes.

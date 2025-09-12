@@ -118,7 +118,9 @@ def update_formula(version, checksums)
   end
   
   # Replace placeholders
+  version_numeric = version.sub(/^v/, '')
   formula = template.gsub('{{VERSION}}', version)
+                   .gsub('{{VERSION_NUMERIC}}', version_numeric)
                    .gsub('{{DARWIN_AMD64_SHA}}', darwin_amd64_sha)
                    .gsub('{{DARWIN_ARM64_SHA}}', darwin_arm64_sha)
                    .gsub('{{LINUX_AMD64_SHA}}', linux_amd64_sha)

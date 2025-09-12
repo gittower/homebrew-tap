@@ -24,6 +24,7 @@
 require 'net/http'
 require 'uri'
 require 'json'
+require 'optparse'
 
 def fetch_url(url)
   uri = URI(url)
@@ -47,6 +48,17 @@ end
 REPO_URL = 'https://api.github.com/repos/gittower/git-flow-next'
 TEMPLATE_FILE = 'Formula/git-flow-next.rb.template'
 FORMULA_FILE = 'Formula/git-flow-next.rb'
+
+def get_current_version
+  return nil unless File.exist?(FORMULA_FILE)
+  
+  content = File.read(FORMULA_FILE)
+  if match = content.match(/version\s+"([^"]+)"/)
+    match[1]
+  else
+    nil
+  end
+end
 
 def fetch_latest_release
   response = fetch_url("#{REPO_URL}/releases")
@@ -116,35 +128,82 @@ def update_formula(version, checksums)
   puts "Updated #{FORMULA_FILE} with version #{version}"
 end
 
+def has_git_changes?
+  # Check if there are any staged or unstaged changes to the formula file specifically
+  system("git diff --quiet #{FORMULA_FILE}") && system("git diff --cached --quiet #{FORMULA_FILE}")
+  !$?.success?
+end
+
 def commit_changes(version)
   system('git add Formula/git-flow-next.rb')
-  system("git commit -m \"Update to #{version}\"")
-  puts "Committed changes with message: Update to #{version}"
+  
+  if has_git_changes?
+    system("git commit -m \"Update to #{version}\"")
+    puts "Committed changes with message: Update to #{version}"
+    true
+  else
+    puts "No changes detected, skipping commit"
+    false
+  end
 end
 
 def main
+  # Parse command line arguments
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: #{$0} [options]"
+    
+    opts.on("-f", "--force", "Force update even if version hasn't changed") do
+      options[:force] = true
+    end
+    
+    opts.on("-h", "--help", "Show this help message") do
+      puts opts
+      exit
+    end
+  end.parse!
+
   puts "=== Formula Update Process ==="
   puts
   
-  puts "Step 1/5: Fetching latest release from GitHub..."
-  release = fetch_latest_release
-  version = release['tag_name']
-  puts "  ✓ Found latest version: #{version}"
+  puts "Step 1/6: Checking current version..."
+  current_version = get_current_version
+  if current_version
+    puts "  ✓ Current formula version: #{current_version}"
+  else
+    puts "  ! No current version found in formula"
+  end
   puts
   
-  puts "Step 2/5: Downloading checksums file..."
-  checksums_url = "https://github.com/gittower/git-flow-next/releases/download/#{version}/git-flow-next-#{version}-checksums.txt"
+  puts "Step 2/6: Fetching latest release from GitHub..."
+  release = fetch_latest_release
+  latest_version = release['tag_name']
+  puts "  ✓ Found latest version: #{latest_version}"
+  puts
+  
+  # Check if update is needed
+  if current_version == latest_version && !options[:force]
+    puts "✨ Formula is already up-to-date (#{current_version})"
+    puts "   Use --force flag to update anyway"
+    exit 0
+  elsif current_version == latest_version && options[:force]
+    puts "⚠️  Forcing update even though version hasn't changed (#{current_version})"
+    puts
+  end
+  
+  puts "Step 3/6: Downloading checksums file..."
+  checksums_url = "https://github.com/gittower/git-flow-next/releases/download/#{latest_version}/git-flow-next-#{latest_version}-checksums.txt"
   puts "  → Fetching: #{checksums_url}"
-  checksums = fetch_checksums(version)
+  checksums = fetch_checksums(latest_version)
   puts "  ✓ Downloaded checksums for #{checksums.keys.length} files"
   puts
   
-  puts "Step 3/5: Extracting required platform checksums..."
+  puts "Step 4/6: Extracting required platform checksums..."
   required_files = [
-    "git-flow-next-#{version}-darwin-amd64.tar.gz",
-    "git-flow-next-#{version}-darwin-arm64.tar.gz", 
-    "git-flow-next-#{version}-linux-amd64.tar.gz",
-    "git-flow-next-#{version}-linux-arm64.tar.gz"
+    "git-flow-next-#{latest_version}-darwin-amd64.tar.gz",
+    "git-flow-next-#{latest_version}-darwin-arm64.tar.gz", 
+    "git-flow-next-#{latest_version}-linux-amd64.tar.gz",
+    "git-flow-next-#{latest_version}-linux-arm64.tar.gz"
   ]
   
   required_files.each do |file|
@@ -156,23 +215,34 @@ def main
   end
   puts
   
-  puts "Step 4/5: Updating formula template..."
+  puts "Step 5/6: Updating formula template..."
   puts "  → Reading template: #{TEMPLATE_FILE}"
   puts "  → Writing formula: #{FORMULA_FILE}"
-  update_formula(version, checksums)
+  update_formula(latest_version, checksums)
   puts "  ✓ Formula updated successfully"
   puts
   
-  puts "Step 5/5: Committing changes to git..."
+  puts "Step 6/6: Committing changes to git..."
   puts "  → Staging: #{FORMULA_FILE}"
-  puts "  → Commit message: \"Update to #{version}\""
-  commit_changes(version)
-  puts "  ✓ Changes committed"
-  puts
+  puts "  → Checking for changes..."
   
-  puts "🎉 Formula update completed successfully!"
-  puts "   Version: #{version}"
-  puts "   Formula: #{FORMULA_FILE}"
+  committed = commit_changes(latest_version)
+  
+  if committed
+    puts "  ✓ Changes committed"
+    puts
+    puts "🎉 Formula update completed successfully!"
+    puts "   Updated from: #{current_version || 'unknown'}"
+    puts "   Updated to: #{latest_version}"
+    puts "   Formula: #{FORMULA_FILE}"
+  else
+    puts "  ℹ️  No changes to commit"
+    puts
+    puts "✨ Formula processing completed"
+    puts "   Version: #{latest_version}"
+    puts "   Formula: #{FORMULA_FILE}"
+    puts "   Note: No changes were detected in the formula file"
+  end
 end
 
 if __FILE__ == $0

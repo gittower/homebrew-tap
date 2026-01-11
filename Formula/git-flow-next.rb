@@ -1,36 +1,36 @@
 class GitFlowNext < Formula
   desc "Next-generation Git Flow tool"
   homepage "https://github.com/gittower/git-flow-next"
-  version "0.1.1"
+  version "0.2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/gittower/git-flow-next/releases/download/v0.1.1/git-flow-next-v0.1.1-darwin-amd64.tar.gz"
-      sha256 "e4be53b2971acfdc54bb63e4f3b4f6f9e401ee31a61deb48042748a753716683"
+      url "https://github.com/gittower/git-flow-next/releases/download/v0.2.0/git-flow-next-v0.2.0-darwin-amd64.tar.gz"
+      sha256 "e6097915e2ba689656c47f0a315535d55642e323c7f6905001065936deb08a33"
       def install
-        bin.install "git-flow-v0.1.1-darwin-amd64" => "git-flow"
+        bin.install "git-flow-v0.2.0-darwin-amd64" => "git-flow"
       end
     elsif Hardware::CPU.arm?
-      url "https://github.com/gittower/git-flow-next/releases/download/v0.1.1/git-flow-next-v0.1.1-darwin-arm64.tar.gz"
-      sha256 "485649fe5d51d6ff77f900ab48e3b22fe206ea3d108d36578c3fdbddc882c265"
+      url "https://github.com/gittower/git-flow-next/releases/download/v0.2.0/git-flow-next-v0.2.0-darwin-arm64.tar.gz"
+      sha256 "157b7f104cd03d1606054062f8ab0d4d80b906d78aac2f486bc639e4be5651cb"
       def install
-        bin.install "git-flow-v0.1.1-darwin-arm64" => "git-flow"
+        bin.install "git-flow-v0.2.0-darwin-arm64" => "git-flow"
       end
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/gittower/git-flow-next/releases/download/v0.1.1/git-flow-next-v0.1.1-linux-amd64.tar.gz"
-      sha256 "ca3876c11891cd720b3a437a0e47952aabfdb5fa2a6bb1dac34f5d8b7bcdc8ba"
+      url "https://github.com/gittower/git-flow-next/releases/download/v0.2.0/git-flow-next-v0.2.0-linux-amd64.tar.gz"
+      sha256 "6266dbd047b70c4b1da2bd2f42286848b4639afcf20e16f942023b8a70cee959"
       def install
-        bin.install "git-flow-v0.1.1-linux-amd64" => "git-flow"
+        bin.install "git-flow-v0.2.0-linux-amd64" => "git-flow"
       end
     elsif Hardware::CPU.arm?
-      url "https://github.com/gittower/git-flow-next/releases/download/v0.1.1/git-flow-next-v0.1.1-linux-arm64.tar.gz"
-      sha256 "2b29fae802e994de05f9700aac76ec6df9e0b1ab402de742de76ac4d0f58045c"
+      url "https://github.com/gittower/git-flow-next/releases/download/v0.2.0/git-flow-next-v0.2.0-linux-arm64.tar.gz"
+      sha256 "a4659db3217b372df7aad6565a1770ae9ab2b1ed77a059c7ecc9845dadf70934"
       def install
-        bin.install "git-flow-v0.1.1-linux-arm64" => "git-flow"
+        bin.install "git-flow-v0.2.0-linux-arm64" => "git-flow"
       end
     end
   end

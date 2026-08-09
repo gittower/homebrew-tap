@@ -36,6 +36,6 @@ class GitFlowNext < Formula
   end
 
   test do
-    system "#{bin}/git-flow", "--version"
+    system "#{bin}/git-flow", "version"
   end
 end
